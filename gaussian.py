@@ -29,8 +29,6 @@ s = 1
 x = sp.arange(xMin, xMax, dx)
 y = ((2*sp.pi*s**2)**-0.5)*sp.exp(-(x-u)**2/(2*s**2))
 
-
-
 # Create a figure, set axis properties, turn on the grid, and hold the current
 # state of the axes
 xTickw = float(xRange)/10	# difference between x ticks

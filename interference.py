@@ -39,7 +39,6 @@ pos = np.array([[ctr[0], ctr[1]],
 				[ctr[0] - d, ctr[1] - d]])
 
 
-
 # Calculate important variables for computations
 k = 2*sp.pi/wl
 R = (height**2 + width**2)**0.5
@@ -84,6 +83,7 @@ std:		{0[std]}
 """.format(img_stats)
 
 # Displays Image
+#plt.imsave('interference_example.png', img, cmap=plt.cm.gray)
 plt.imshow(img, cmap=plt.cm.gray)
 plt.show()
 
