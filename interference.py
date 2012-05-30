@@ -9,21 +9,20 @@ intensity is then calculated as the square of the summed radiation at each
 point.  An image is then produced based upon the calculated intensities.
 '''
 
-import scipy as sp				# Needed for array objects
-import numpy as np
+import numpy as np              # Used for array objects
 import matplotlib.pyplot as plt	# Used to create the image
 
 
 # Wavelength of radiation
-wl = 1
+wl = .2
 
 # The real height and width of the image
-height = 1e1
-width = 1e1
+height = 1
+width = 1
 
 # The configuration position vectors [x,y]
 # (0,0 = top left corner of image)
-d = 1.5
+d = .5
 
 #n = int(height/d)
 #pos = np.zeros([n,2])
@@ -40,7 +39,7 @@ pos = np.array([[ctr[0], ctr[1]],
 
 
 # Calculate important variables for computations
-k = 2*sp.pi/wl
+k = 2*np.pi/wl
 R = (height**2 + width**2)**0.5
 
 # The size of a pixel
@@ -58,7 +57,7 @@ for p in pos:
 			b = 1 - (r/R)**0.5
 
 			# Calculates amplitude of the radiation field at current position
-			img[y,x] += sp.cos(k*r)#*b
+			img[y,x] += np.cos(k*r)#*b
 
 
 # Calculates Intensity Diffraction Pattern
