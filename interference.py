@@ -14,15 +14,15 @@ import matplotlib.pyplot as plt	# Used to create the image
 
 
 # Wavelength of radiation
-wl = .2
+wl = 1.
 
 # The real height and width of the image
-height = 1
-width = 1
+height = 100.
+width = 100.
 
 # The configuration position vectors [x,y]
 # (0,0 = top left corner of image)
-d = .5
+d = .1
 
 #n = int(height/d)
 #pos = np.zeros([n,2])
@@ -32,10 +32,10 @@ d = .5
 
 ctr = (width/2, height/2)
 pos = np.array([[ctr[0], ctr[1]],
-				[ctr[0] + d, ctr[1] + d],
-				[ctr[0] - d, ctr[1] + d],
-				[ctr[0] + d, ctr[1] - d],
-				[ctr[0] - d, ctr[1] - d]])
+				[ctr[0] + d*2.**.5, ctr[1] + d*2.**.5],
+				[ctr[0] - d*2.**.5, ctr[1] + d*2.**.5],
+				[ctr[0] + d*2.**.5, ctr[1] - d*2.**.5],
+				[ctr[0] - d*2.**.5, ctr[1] - d*2.**.5]])
 
 
 # Calculate important variables for computations
@@ -57,7 +57,7 @@ for p in pos:
 			b = 1 - (r/R)**0.5
 
 			# Calculates amplitude of the radiation field at current position
-			img[y,x] += np.cos(k*r)#*b
+			img[y,x] += np.cos(k*r)*b
 
 
 # Calculates Intensity Diffraction Pattern
