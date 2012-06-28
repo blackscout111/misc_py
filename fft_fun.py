@@ -41,6 +41,22 @@ def box(t,w=2.,h=1.):
     """
     if abs(t) < w: return h
     else: return 0.
+
+# Stair wave function
+def stair(t,w=2.,h=1):
+    if abs(t) < w:
+        if t < 0: return h
+        elif t ==0: return 0
+        else: return -h
+    else: return 0
+
+# Trifilter function
+def trifilter(t,w=2.,h=1):
+    if t == w: return h
+    elif t == 0: return -2.*h
+    elif t == -2: return h
+    else: return 0
+
     
 # Return a Gaussian distribution
 def gaus(t,mean=0.,sigma=1.):
@@ -49,53 +65,63 @@ def gaus(t,mean=0.,sigma=1.):
     standard deviation = "sigma"
     """
     return exp(-(t - mean)**2./(2.*sigma))/sqrt(2.*pi*sigma**2.)
+
+#_______________________________________________________________________________
+if __name__ == "__main__":
+    f_s = 2.**8    # sampling frequency
+    fsig = 1.      # Max signal frequency
+    N = 2**10      # Number of samples (should be a power of 2)
+
+    fo = f_s/N
+    wsig = 2*pi*fsig
+    n = arange(-N/2,N/2)
+    t = n/f_s
+    assert(N == len(n))
+
+    # Calculate the time function
+    #y = sin(wsig*t);
+    #y = cos(wsig*t);
+    y = 2*fsig*sinc(wsig*t)
+    #y = array(map(gaus,t))
+    #y = array(map(box,t))
+    #y = array(map(stair,t))
+    #y = array(map(trifilter,t))
     
 
-f_s = 2.**3.  # sampling frequency
-fsig = 1.     # Max signal frequency
-N = 2**8      # Number of samples
-fo = f_s/N
-wsig = 2*pi*fsig
+    figure(1)
+    taxis = [0. for x in t]
+    a = max(abs(y))
+    plot(t,y,'-')
+    plot(t,taxis,"k")
+    ylim([-1.1*a,1.1*a])
+    title("Time Domain")
+    xlabel("t (sec)")
+    ylabel("y(t)")
 
-n = arange(0,N-1)
-t = n/f_s
+    # Fourier Transform
+    f = n*fo
+    f -= scipy.median(f)
+    Y = fftshift(fft(y))
+    Y *= exp(1.0j*pi*n)     # Needed to fix the "time shift"
+                            # createdfrom not starting at t=0
 
-#y = sin(wsig*t);
-#y = cos(wsig*t);
-#y = 2*fsig*sinc(wsig*t)
-#y = array(map(gaus,t))
-y = array(map(box,t))
+    # Views of the transform
+    Yabs = abs(Y)
+    Yang = angle(Y)
+    Yre = real(Y)
+    Yim = imag(Y)
+    A = max(Yabs)
 
-figure(1)
-taxis = [0. for x in t]
-a = max(abs(y))
-plot(t,y,'-')
-plot(t,taxis,"k")
-ylim([-1.1*a,1.1*a])
-title("Time Domain")
-xlabel("t (sec)")
-ylabel("y(t)")
+    figure(2)
+    faxis = [0. for x in f]
+    plot(f,Yre,'-')
+    plot(f,taxis,'k')
+    ylim([-1.1*A,1.1*A])
+    title("Frequency Domain")
+    xlabel("f (Hz)")
+    ylabel("Y(f)")
 
-# Fourier Transform
-f = n*fo
-f -= scipy.median(f)
-Y = fftshift(fft(y))
-Yabs = abs(Y)
-Yang = angle(Y)
-Yre = real(Y)
-Yim = imag(Y)
-A = max(Yabs)
-
-figure(2)
-faxis = [0. for x in f]
-plot(f,Yre,'-')
-plot(f,taxis,'k')
-ylim([-1.1*A,1.1*A])
-title("Frequency Domain")
-xlabel("f (Hz)")
-ylabel("Y(f)")
-
-# Display plots
-show()
+    # Display plots
+    show()
 
 
