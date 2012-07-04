@@ -63,31 +63,40 @@ def demodulate(N,N0,Y,Inv='False'):
     else: return Y*exp((-2.0j*scipy.pi*n/N)*(N/2))
     
 
-# The box wave function
 def box(t,w=1.,h=1.):
     """
-    Given a value, t, will return the value of the square pulse at that time.
+    The Box Function
+    
+           ^
+      h +--|--+
+        |  |  |
+    --------------> t
+       -w  |  w
+           |
+          
     """
     if abs(t) < w: return h
     else: return 0.
 
-# Stair wave function
 def stair(t,w=1.,h=1.):
+    """
+    Two box functions next to the orign.
+    
+           ^
+      h +--|
+        |  |  w
+    --------------> t
+       -w  |  | 
+           |--+ -h
+          
+    """
     if abs(t) < w:
-        if t < 0: return h
+        if t < 0: return -h
         elif t ==0: return 0
-        else: return -h
-    else: return 0
-
-# Trifilter function
-def trifilter(t,w=1.,h=1):
-    if t == w: return h
-    elif t == 0: return -2.*h
-    elif t == -2: return h
+        else: return h
     else: return 0
 
     
-# Return a Gaussian distribution
 def gaus(t,mean=0.,sigma=1.,norm=False):
     """
     Return gaussian distribution with mean = "mean" and
@@ -118,7 +127,6 @@ if __name__ == "__main__":
 #    y = array(map(lambda t:gaus(t,0.,.01),t))
 #    y = array(map(lambda t:box(t,1.,1.),t))
 #    y = array(map(lambda t:stair(t,1.,1.),t))
-#    y = array(map(lambda t:trifilter(t,1.,1.),t))
     
     # Calculate the transfer function starting with a filter in frequency space
     h = array(map(lambda f:gaus(f,0.,1.),f))
@@ -150,7 +158,7 @@ if __name__ == "__main__":
     grid(True)
 
 
-    # Views of the transform
+    # Views of the fourier transform
     Yabs = abs(Y)
     Yang = angle(Y)
     Yre = real(Y)
