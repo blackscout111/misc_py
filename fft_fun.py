@@ -61,7 +61,22 @@ def demodulate(N,N0,Y,Inv='False'):
     assert(len(Y) == len(n))
     if Inv: return Y*exp((-2.0j*scipy.pi*n/N)*(N/2))
     else: return Y*exp((-2.0j*scipy.pi*n/N)*(N/2))
+
+
+def step(t,h=1.):
+    """
+    The step fucntion
     
+        ^
+      h |---------
+        |
+    --------------> t
+        |
+        
+    """ 
+    if t == 0.: return h*.5
+    elif t > 0.: return h
+    else: return 0.
 
 def box(t,w=1.,h=1.):
     """
@@ -76,6 +91,7 @@ def box(t,w=1.,h=1.):
           
     """
     if abs(t) < w: return h
+    elif abs(t) == w: return h*.5
     else: return 0.
 
 def stair(t,w=1.,h=1.):
@@ -94,6 +110,7 @@ def stair(t,w=1.,h=1.):
         if t < 0: return -h
         elif t ==0: return 0
         else: return h
+    elif abs(t) == w: return h*.5
     else: return 0
 
     
@@ -124,15 +141,27 @@ if __name__ == "__main__":
 #    y = sin(wsig*t);
 #    y = cos(wsig*t);
     y = 2*fsig*sinc(wsig*t)
+#    y = array(map(lambda t:step(t,1.),t))
 #    y = array(map(lambda t:gaus(t,0.,.01),t))
 #    y = array(map(lambda t:box(t,1.,1.),t))
 #    y = array(map(lambda t:stair(t,1.,1.),t))
+
+    # Calculate the transfer function
+#    h = sin(wsig*t);
+#    h = cos(wsig*t);
+#    h = 2*fsig*sinc(wsig*t)
+#    h = array(map(lambda t:step(t,1.),t))
+#    h = array(map(lambda t:gaus(t,0.,1,True),t))
+#    h = array(map(lambda t:box(t,1.,1.),t))
+#    h = array(map(lambda t:stair(t,1.,1.),t))
     
     # Calculate the transfer function starting with a filter in frequency space
-    h = array(map(lambda f:gaus(f,0.,1.),f))
+#    h = array(map(lambda f:step(f,2.),f))
+    h = array(map(lambda f:gaus(f,0.,1.0),f))
 #    h = array(map(lambda f:box(f,1.,1.),f))
-    h = real(ifft(ifftshift(demodulate(N,N/2,h,True)))) # Convert to time space
-
+    h = ifft(ifftshift(demodulate(N,N/2,h,True))) # Convert to time space
+    h = real(h)
+    
     # Fourier Transform
     Y = demodulate(N,N/2,fftshift(fft(y)))
     H = demodulate(N,N/2,fftshift(fft(h)))
@@ -142,23 +171,6 @@ if __name__ == "__main__":
     g = fftconvolve(y,h,mode='same')
 #    g = ifft(ifftshift(demodulate(N,N/2,G,True)))  # Good proof of concept
     
-    
-    # Views of the signals
-    figure(1)
-    taxis = [0. for x in t]
-    a = max(abs(y))
-    plot(t,y,'.-',label='y(t)',color='#3465a4')
-    plot(t,h,'.-',label='h(t)',color='#f57900')
-    plot(t,g,'.-',label='g(t)',color='#73d216')
-    plot(t,taxis,"k")
-    ylim([-1.1*a,1.1*a])
-    title("Time Domain")
-    xlabel("t (sec)")
-    legend()
-    grid(True)
-
-
-    # Views of the fourier transform
     Yabs = abs(Y)
     Yang = angle(Y)
     Yre = real(Y)
@@ -176,7 +188,26 @@ if __name__ == "__main__":
     Gre = real(G)
     Gim = imag(G)
     Gmax = max(Gabs)
+    
+    
+    # Views of the signals
+    figure(1)
+    taxis = [0. for x in t]
+    a = max(abs(y))
+    plot(t,y,'.-',label='y(t)',color='#3465a4')
+    plot(t,real(h),'.-',label='h(t)',color='#f57900')
+    
+    plot(t,g,'.-',label='g',color='#73d216')
+    
+    plot(t,taxis,"k")
+    ylim([-1.1*a,1.1*a])
+    title("Time Domain")
+    xlabel("t (sec)")
+    legend()
+    grid(True)
 
+
+    # Views of the fourier transform
     figure(2)
     faxis = [0. for x in f]
     
