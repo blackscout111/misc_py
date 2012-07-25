@@ -38,7 +38,7 @@ arcsinh = scipy.arcsinh
 arccosh = scipy.arccosh
 
 
-def demodulate(N,N0,Y,Inv='False'):
+def demodulate(N,N0,Y,Inv=False):
     """
     Removes the frequency modulation caused by having a data set where the 't=0' 
     point isn't the first value in the set.
@@ -57,10 +57,11 @@ def demodulate(N,N0,Y,Inv='False'):
             would be the time domain sample.
     """
     n = scipy.arange(-N0,N-N0)
+    W = exp(2.0j*pi*N0/N)
     
     assert(len(Y) == len(n))
-    if Inv: return Y*exp((-2.0j*scipy.pi*n/N)*(N/2))
-    else: return Y*exp((-2.0j*scipy.pi*n/N)*(N/2))
+    if Inv: return Y*W**-n
+    else: return Y*W**n
 
 
 def step(t,h=1.):
@@ -128,10 +129,11 @@ if __name__ == "__main__":
     f_s = 2.**5    # sampling frequency
     fsig = 1.      # Max signal frequency
     N = 2**8       # Number of samples (should be a power of 2)
+    N0 = N/2       # Index where 't=0'
 
     fo = f_s/N
     wsig = 2*pi*fsig
-    n = arange(-N/2,N/2)
+    n = arange(-N0,N-N0)
     t = n/f_s
     f = n*fo
     f -= scipy.median(f)
@@ -159,17 +161,17 @@ if __name__ == "__main__":
 #    h = array(map(lambda f:step(f,2.),f))
     h = array(map(lambda f:gaus(f,0.,1.0),f))
 #    h = array(map(lambda f:box(f,1.,1.),f))
-    h = ifft(ifftshift(demodulate(N,N/2,h,True))) # Convert to time space
+    h = ifft(ifftshift(demodulate(N,N0,h,True))) # Convert to time space
     h = real(h)
     
     # Fourier Transform
-    Y = demodulate(N,N/2,fftshift(fft(y)))
-    H = demodulate(N,N/2,fftshift(fft(h)))
+    Y = demodulate(N,N0,fftshift(fft(y)))
+    H = demodulate(N,N0,fftshift(fft(h)))
     
     # Convolution of y and h
     G = Y*H
-    g = fftconvolve(y,h,mode='same')
-#    g = ifft(ifftshift(demodulate(N,N/2,G,True)))  # Good proof of concept
+    g = fftconvolve(y,h,mode='full')[N0:N+N0]
+#    g = ifft(ifftshift(demodulate(N,N0,G,True)))  # Good proof of concept
     
     Yabs = abs(Y)
     Yang = angle(Y)
